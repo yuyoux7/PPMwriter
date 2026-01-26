@@ -46,7 +46,7 @@ typedef struct
 
 typedef struct 
 {
-    char** Data;
+    ColorVector3* Data;
     size_t _Size_; // pool size
 }DataVector2;
 
@@ -67,7 +67,6 @@ typedef struct
 bool InitializationPPMImage(PPMImage* self);
 bool OpenPPMFile(PPMImage* self, const char* filename);
 void SetPPMSize(PPMImage* self, int Width, int hight);
-char* PPMColorToStr(int Data);
 void WritePPM_C(PPMImage* self, int r, int g, int b);
 void WritePPM_V3(PPMImage* self, ColorVector3 color);
 bool ClosePPMFile(PPMImage* self);
@@ -75,8 +74,6 @@ bool FreePPMImage(PPMImage* self);
 
 bool InitializationPPMImage(PPMImage* self)
 {
-    if (self->Data->_Size_)
-        return false;
     self->Height = 0;
     self->Width = 0;
     self->Data = nullptr;
@@ -105,7 +102,7 @@ void SetPPMSize(PPMImage* self, int Width, int hight)
             fputs("255\n", self->File);  
         }
         else {
-            fprintf(stderr, "flie not open to write");
+            fprintf(stderr, "Flie not opens");
         }
         self->Data = (Pixel*)malloc(sizeof(Pixel));
         if (!self->Data)
@@ -114,52 +111,21 @@ void SetPPMSize(PPMImage* self, int Width, int hight)
         }
         else {
             self->Data->_Size_ = Width * hight * 3;
-            self->Data->Data.Data = (char**)malloc(Width * hight * sizeof(char*) * 8);
-            *self->Data->Data.Data = (char*)malloc(Width * hight * sizeof(char));
+            self->Data->Data.Data = (ColorVector3*)malloc(sizeof(ColorVector3) * self->Data->_Size_);
             if (!self->Data->Data.Data)
-            {
                 fprintf(stderr, "Memory self->Data->Data.Data error");
-            }
             self->Data->Data._Size_ = 0;
         }
     }
-}
-
-char* PPMColorToStr(int Data)
-{
-    int _Size_ = 0;
-    char flash[3];
-    char* recflash;
-    for (int i = (Data % ColorRange); i; i/=10)
-    {
-        flash[_Size_] = ((i % 10) + '0');
-        _Size_++;
-    }
-    if (!Data)
-    {
-        recflash = (char*)malloc(sizeof(char));
-        *recflash = '0';
-        return recflash;
-    }
-    recflash = (char*)malloc(sizeof(char) * _Size_);
-    for (int i = 0; i < _Size_; i++)
-    {
-        *(recflash + i) = flash[(_Size_ - i) - 1];
-    }
-    return recflash;
 }
 
 void WritePPM_C(PPMImage* self, int r, int g, int b)
 {
     if (self->Data && (((self->Data->Data._Size_ - 2) < self->Data->_Size_) || self->Data->Data._Size_ < 2))
     {
-        *(self->Data->Data.Data + self->Data->Data._Size_) = PPMColorToStr(r);
+        *(self->Data->Data.Data + self->Data->Data._Size_) = {r, g, b};
         fputc(r, self->File);
-        self->Data->Data._Size_++;
-        *(self->Data->Data.Data + self->Data->Data._Size_) = PPMColorToStr(g);
         fputc(g, self->File);
-        self->Data->Data._Size_++;
-        *(self->Data->Data.Data + self->Data->Data._Size_) = PPMColorToStr(b);
         fputc(b, self->File);
         self->Data->Data._Size_++;
     }
@@ -182,8 +148,6 @@ bool ClosePPMFile(PPMImage* self)
 bool FreePPMImage(PPMImage* self)
 {
     if (self->Data){
-        if (self->Data->Data.Data)
-           free(self->Data->Data.Data);
         free(self->Data);
     }
     self->Data = nullptr;
