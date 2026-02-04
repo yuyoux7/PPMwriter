@@ -22,7 +22,7 @@ int main()
 }
 ```
 
-![example.ppm] (./example.png)
+![example.ppm](example.png)
 
 # Function Introduction
 
