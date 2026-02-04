@@ -6,22 +6,18 @@ A Image file type Writer
 
 int main()
 {
-    ColorVector3 Color = {0x10/*Red Color Value*/, 0xFF/*Green Color Value*/, 0x10/*Blue Color Value*/};
-    int Width = 500, Height = 500;
-    PPMImage picture;
-    char PPMFilename[] = "Filename.ppm";
+    PPMImage picture = {};    
     InitializationPPMImage(&picture);
-    if (!OpenPPMFile(&picture, PPMFilename))
-    { 
-        fprintf(stderr, "Can't open %s file", PPMFilename);
-        return -1;
-    }
-    SetPPMSize(&picture, Width, Height);
-    for (int i = 0; i < Width * Height; i++)
+    OpenPPMFile(&picture, "example.ppm");
+    SetPPMSize(&picture, 255, 255);    
+    for (int j = 255; j > 0; j--)
     {
-        WritePPM_V3(&picture, Color);
+        for (int i = 0; i < 255; i++)
+        {
+            WritePPM_C(&picture, (((j - i) > 0) ? (j - i) : (i - j)), (i), (255 - j));
+        }
     }
-    ClosePPMFile(&picture)
+    ClosePPMFile(&picture);
     FreePPMImage(&picture);
 }
 ```
