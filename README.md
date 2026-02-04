@@ -22,6 +22,8 @@ int main()
 }
 ```
 
+![example.ppm] (./example.png)
+
 # Function Introduction
 
 <h4>Initialization PPM Image Object</h4>
